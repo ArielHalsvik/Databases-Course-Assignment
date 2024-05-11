@@ -1,0 +1,6 @@
+[
+    {
+        "id": 1,
+        "query": "INSERT INTO adoptions (AdoptionDate, UserId, AnimalId) VALUES ('2020-02-12', '2', '8');"
+    }
+]

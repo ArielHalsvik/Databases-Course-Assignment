@@ -1,22 +1,49 @@
-var express = require('express');
+var express = require("express");
 var router = express.Router();
+const bodyParser = require("body-parser");
+const jsonParser = bodyParser.json();
+const db = require("../models");
+const TemperamentService = require("../services/TemperamentService");
+const temperamentService = new TemperamentService(db);
 
-router.get('/', async function (req, res, next) {
-    temperament = [
-        {
-            Id: 1,
-            Name: "Calm"
-        },
-        {
-            Id: 2,
-            Name: "Scared"
-        }
-    ]
-    res.render("temperament", {user: null, temperament: temperament})
-})
+const { checkIfAdmin } = require("./authMiddleware");
 
-router.post('/update', async function (req,res,next){
-    res.render("index",{user: null})
-})
+/* GET Temperaments Page */
+router.get("/", checkIfAdmin, async function (req, res, next) {
+  const temperament = await temperamentService.getAll();
+
+  res.render("temperament", { user: req.user, temperament: temperament });
+});
+
+/* Update Temperament */
+router.post("/update", checkIfAdmin, jsonParser, async function (req, res, next) {
+    const temperamentId = req.body.id;
+    const temperament = req.body.temperament;
+
+    await temperamentService.updateTemperament(temperamentId, temperament);
+    res.render("index", { user: req.user });
+  }
+);
+
+/* Delete Temperament */
+router.post("/delete", checkIfAdmin, jsonParser, async function (req, res) {
+  const temperamentId = req.body.id;
+  await temperamentService.deleteTemperament(temperamentId);
+  res.end();
+});
+
+/* Add Temperament */
+router.post("/add", checkIfAdmin, jsonParser, async function (req, res, next) {
+  const name = req.body.name;
+  try {
+    const temperament = await temperamentService.createTemperament(name);
+
+    res.redirect("/temperament");
+
+    res.render("temperament", { user: req.user, temperament: temperament || {} });
+  } catch (error) {
+    next(error);
+  }
+});
 
 module.exports = router;

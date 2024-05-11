@@ -1,0 +1,14 @@
+[
+    {
+        "id": 1,
+        "query": "INSERT INTO users (FullName, Username, Password, RoleId) VALUES ('System admin', 'Admin', 'admin1234', '1');"
+    },
+    {
+        "id": 2,
+        "query": "INSERT INTO users (FullName, Username, Password, RoleId) VALUES ('User', 'User', 'user1234', '2');"
+    },
+    {
+        "id": 3,
+        "query": "INSERT INTO users (FullName, Username, Password, RoleId) VALUES ('User2', 'User2', 'User1234', '2');"
+    }
+]

@@ -25,11 +25,11 @@
                 <%=temp.Id%>
               </span>
               <span class="col py-1 bg-light">
-                <%=temp.Name%>
+                <%=temp.Temperament%>
               </span>
               <span class="col py-1 bg-light text-center">
-                <button class="btn-sm btn-warning" onclick="updateTemperament(<%=temp.Id%>)">Update temperament</button>
-                <button class="btn-sm btn-danger" onclick="deleteTemperament(<%=temp.Id%>)">Delete temperament</button>
+                <button class="btn-sm btn-warning" onclick="updateTemperament('<%=temp.Id%>')">Update temperament</button>
+                <button class="btn-sm btn-danger" onclick="deleteTemperament('<%=temp.Id%>')">Delete temperament</button>
               </span>
             </div>
             <% }); %>
@@ -38,6 +38,7 @@
               <div class="col-4"></div>
               <div class="col-4 text-center mt-2">
                 <form action="/temperament/add" method="POST">
+                  <input type="text" name="name" id="TemperamentName" placeholder="Temperament Name">
                   <button class="btn btn-success" id="btn-add-animal" >Add New Temperament</button>
                 </form>
               </div>

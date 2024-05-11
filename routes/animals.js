@@ -1,130 +1,84 @@
-var express = require('express');
+var express = require("express");
 var router = express.Router();
+const bodyParser = require("body-parser");
+const jsonParser = bodyParser.json();
+const db = require("../models");
 
-router.get('/', async function (req, res, next) {
-  // const animals = await animalService.getAll();
-  let animals =  [
-    {
-      "Id": 1,
-      "Name": "Coco",
-      "Species": "Dwarf Hamster",
-      "Birthday": "2020-02-12",
-      "Temperament": "calm, scared",
-      "Size": "small",
-      "Adopted": false
-    },
-    {
-      "Id": 2,
-      "Name": "Ted",
-      "Species": "Tedy bear hamster",
-      "Birthday": "2021-02-12",
-      "Temperament": "calm, scared",
-      "Size": "small",
-      "Adopted": false
-    },
-    {
-      "Id": 3,
-      "Name": "Coco",
-      "Species": "Jack-Russel",
-      "Birthday": "2020-02-12",
-      "Temperament": "energetic",
-      "Size": "medium",
-      "Adopted": false
-    },
-    {
-      "Id": 4,
-      "Name": "Everrest",
-      "Species": "Budgy",
-      "Birthday": "2019-02-12",
-      "Temperament": "calm, happy",
-      "Size": "small",
-      "Adopted": false
-    },
-    {
-      "Id": 5,
-      "Name": "Rocko",
-      "Species": "Tortouse",
-      "Birthday": "2020-02-12",
-      "Temperament": "calm, lazy",
-      "Size": "medium",
-      "Adopted": false
-    },
-    {
-      "Id": 6,
-      "Name": "Goldy",
-      "Species": "Gold Fish",
-      "Birthday": "2023-02-12",
-      "Temperament": "calm",
-      "Size": "small",
-      "Adopted": false
-    },
-    {
-      "Id": 7,
-      "Name": "Lizzy",
-      "Species": "Lizzard",
-      "Birthday": "2020-02-12",
-      "Temperament": "calm,lazy",
-      "Size": "medium",
-      "Adopted": false
-    },
-    {
-      "Id": 8,
-      "Name": "Goga",
-      "Species": "Bearder Dragon",
-      "Birthday": "2018-02-12",
-      "Temperament": "calm, lazy, scared",
-      "Size": "large",
-      "Adopted": true
-    },
-    {
-      "Id": 9,
-      "Name": "Tweet Tweet",
-      "Species": "Parrot",
-      "Birthday": "2020-02-12",
-      "Temperament": "calm, happy",
-      "Size": "large",
-      "Adopted": false
-    },
-    {
-      "Id": 10,
-      "Name": "Toothless",
-      "Species": "Corn snake ",
-      "Birthday": "2017-02-12",
-      "Temperament": "scared",
-      "Size": "medium",
-      "Adopted": false
-    },
-    {
-      "Id": 11,
-      "Name": "Sophie",
-      "Species": "Dwarf Hamster",
-      "Birthday": "2020-02-12",
-      "Temperament": "calm, scared",
-      "Size": "small",
-      "Adopted": false
-    },
-    {
-      "Id": 12,
-      "Name": "Teddy",
-      "Species": "Teddy bear hamster",
-      "Birthday": "2021-02-12",
-      "Temperament": "calm, scared",
-      "Size": "small",
-      "Adopted": false
-    },
-    {
-      "Id": 13,
-      "Name": "Roger",
-      "Species": "Parrot",
-      "Birthday": "2020-02-18",
-      "Temperament": "calm, happy",
-      "Size": "large",
-      "Adopted": false
-    }
-   ]
+const AnimalService = require("../services/AnimalService");
+const animalService = new AnimalService(db);
+const AdoptionService = require("../services/AdoptionService");
+const adoptionService = new AdoptionService(db);
 
-  res.render('animals', { user: null, animals: animals });
+const { checkIfAdmin, checkIfMember } = require("./authMiddleware");
+
+let dateRange = [];
+
+/* GET Animals Page */
+router.get("/", async function (req, res, next) {
+  const animals = await animalService.getAll();
+
+  res.render("animals", { user: req.user, animals: animals });
+});
+
+/* Adoption Create and Delete */
+router.post("/adopt", checkIfMember, jsonParser, async function (req, res, next) {
+    await adoptionService.adoptAnimal(req.body.id, req.user.id);
+
+    res.end();
+  }
+);
+
+router.post("/delete", checkIfAdmin, jsonParser, async function (req, res) {
+  await adoptionService.deleteAdoption(req.body.id);
+
+  res.end();
+});
+
+/* Query Selector - Adopted Animals */
+router.get("/adopted", async function (req, res, next) {
+  const adoptedAnimals = await animalService.adoptedAnimals();
+
+  res.render("animals", { user: req.user, animals: adoptedAnimals });
+});
+
+/* Query Selector - Animals by Age */
+router.get("/age", async function (req, res, next) {
+  const byAge = await animalService.animalsByAge();
+
+  res.render("animals", { user: req.user, animals: byAge });
+});
+
+/* Query Selector - Popular Animal Names */
+router.get("/popularity", async function (req, res, next) {
+  const popularity = await animalService.popularAnimals();
+
+  res.render("animals", { user: req.user, animals: popularity });
+});
+
+/* Query Selector - Animals Per Size */
+router.post("/size", checkIfAdmin, jsonParser, async function (req, res, next) {
+  const dateRange = await animalService.animalsPerSize();
+
+  res.json(dateRange);
+});
+
+/* Query Selector - Animals Born in Date Range */
+router.get("/born", async function (req, res, next) {
+  res.render("animals", { user: req.user, animals: dateRange });
+});
+
+router.post("/born", jsonParser, async function (req, res, next) {
+  try {
+    const dateFrom = req.body.dateFrom;
+    const dateTo = req.body.dateTo;
+
+    dateRange = await animalService.animalsBornInDateRange(dateFrom, dateTo);
+
+    res.render("animals", { user: req.user, animals: dateRange });
+  } catch (error) {
+    console.error(error);
+    res.status(500).send("Internal Server Error");
+  }
 });
 
 module.exports = router;
-
