@@ -1,6 +1,6 @@
 # Course Assignment Information
 
-This is a Database Course Assignment I got in the second semester of my Backend development degree. The task was to create the back-end code for an Animal adoptions web application using MySQL database. The front-end was already premade for this assignment and was only changed if it was required to make my back-end code functional.
+This is a Database Course Assignment I got in the second semester of my Backend development degree. The task was to create the back-end code for an Animal adoptions web application using MySQL database. The front-end was already premade for this assignment and was only changed if it was required to make my back-end code functional This task was done by me alone.
 
 The *Initial Commit* is the original code I got for the assignment.
 
